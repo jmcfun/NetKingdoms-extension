@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "NetKingdoms",
+  "short_name": "NetKingdoms",
+  "description": "Transforme ta navigation quotidienne en guerre territoriale mondiale. Chaque site visité fait progresser ta faction vers la domination. Zéro action requise — le browser, c'est jouer.",
+  "version": "0.1.0",
+  "homepage_url": "https://netkingdoms.gg",
+  "permissions": ["storage", "tabs", "webNavigation", "notifications", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "NetKingdoms — Ta guerre de navigation"
+  },
+  "background": {
+    "service_worker": "src/service-worker.ts"
+  },
+  "icons": {
+    "16":  "icons/icon-16.png",
+    "48":  "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://netkingdoms.gg/*", "http://localhost:8000/*", "https://127.0.0.1:8000/*"],
+      "js": ["src/content-auth-bridge.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["onboarding.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
