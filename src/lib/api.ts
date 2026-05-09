@@ -101,7 +101,10 @@ export async function getMe(token: string): Promise<UserInfo> {
   const res = await fetch(`${API_BASE}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   })
-  if (!res.ok) throw new Error('Session expirée.')
+  // 401 = token genuinely invalid/expired
+  if (res.status === 401) throw new Error('Session expirée.')
+  // Other errors (network, 5xx) — let them propagate as generic errors
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return res.json()
 }
 

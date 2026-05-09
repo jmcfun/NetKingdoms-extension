@@ -47,6 +47,21 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 })
 
 chrome.runtime.onStartup.addListener(async () => {
+  // Validate stored JWT — clear only if actually rejected (401), not on network errors
+  const jwt = await getJwtToken()
+  if (jwt) {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${jwt}` },
+      })
+      if (res.status === 401) {
+        // Genuinely expired/invalid — clear so popup shows login
+        await storeJwtToken(null)
+      }
+      // On network error: keep token, user is just offline
+    } catch { /* offline — keep existing token */ }
+  }
+
   const { pendingBatch } = await chrome.storage.local.get(['pendingBatch'])
   if (Array.isArray(pendingBatch) && pendingBatch.length > 0) {
     visitBatch = pendingBatch

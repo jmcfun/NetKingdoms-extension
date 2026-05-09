@@ -107,9 +107,12 @@ export default function App() {
           ])
           if (res) setResources(res)
           setClan(clanData)
-        } catch {
-          await storeJwtToken(null)
-          setToken(null)
+        } catch (e: unknown) {
+          // Only clear token on explicit 401 — keep it on network errors (offline)
+          if (e instanceof Error && e.message === 'Session expirée.') {
+            await storeJwtToken(null)
+            setToken(null)
+          }
         }
       }
 
